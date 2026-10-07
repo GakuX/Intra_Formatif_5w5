@@ -27,15 +27,42 @@ export default function Home() {
   async function afficherEvents1(){
     clearShapes();
     // TODO: Il faut appeler le serveur pour obtenir l'event retourné
+      const x = await axios.get('http://localhost:5269/api/Dessins/GetDrawing1'); 
+      console.log(x.data); 
+     await  applyEvents(x.data); 
   }
 
   async function afficherEvents2(){
     clearShapes();
     // TODO: Il faut appeler le serveur pour obtenir la séquence d'événements 2 (que vous devez créer sur le serveur)
+
+    const x = await axios.get('http://localhost:5269/api/Dessins/GetDrawing2'); 
+
+    console.log(x.data); 
+
+    for(const events of x.data){
+
+      await applyEvents(events); 
+      
+    }
+
+    
+
+
   }
 
   async function applyEvents(event:any){
     // TODO: Il faut traiter les événements reçus du serveur et dessiner les formes correspondantes
+
+
+ if(event.type == "Square"){
+  drawSquare(event.x, event.y); 
+ }else if(event.type == "Circle"){
+  drawCircle(event.x,event.y); 
+ }else if(event.type == "Star"){
+  drawStar(event.x,event.y, event.innerRadius); 
+ }
+
   }
 
   // ATTENTION: Les méthodes suivantes n'ont pas besoin d'être modifiées pour répondre à la question
@@ -50,7 +77,7 @@ export default function Home() {
   );
 
   function drawSquare(x :number, y:number){
-    let color = currentColor.current;
+    let color = currentColor.current = "red";
     setShapes((shapes) => [...shapes, createSquare(x, y, color)]);
   }
 
@@ -60,7 +87,7 @@ export default function Home() {
   }
 
   function drawStar(x :number, y:number, innerRadius:number){
-    let color = currentColor.current;
+    let color = currentColor.current = "yellow";
     setShapes((shapes) => [...shapes, createStar(x, y, innerRadius,color)]);
   }
 
