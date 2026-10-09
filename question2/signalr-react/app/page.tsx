@@ -26,6 +26,18 @@ export default function Home() {
     .withUrl('http://localhost:5282/hubs/pizza')
     .build();
 
+    newHubConnection.on("UpdateNbUsers", (data) => {
+
+      setUserCount(data); 
+    })
+
+    newHubConnection.start().then(() => {
+            console.log('La connexion est active!');
+          })
+        .catch(err => console.log('Error while starting connection: ' + err));
+
+        setHubConnection(newHubConnection); 
+
     // TODO: Mettre isConnected à true seulement une fois que la connection au Hub est faite
     setIsConnected(true);
   }
@@ -39,9 +51,27 @@ export default function Home() {
   }
 
   function addMoney() {
+
+
+    hubConnection?.invoke("AddMoney", selectChoice ); 
+
+
+
+    hubConnection?.on("UpdateMoney", (data) =>{
+
+      
+      setMoney(data); 
+    })
   }
 
   function buyPizza() {
+
+    hubConnection?.invoke("BuyPizza", selectChoice); 
+
+    hubConnection?.on("UpdateNbPizzasAndMoney", (data1, data2) => {
+            setNbPizzas(data1); 
+            setMoney(data2); 
+    })
   }
 
   return (
