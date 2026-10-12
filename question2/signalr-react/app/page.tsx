@@ -22,56 +22,99 @@ export default function Home() {
     }, []);
 
   function connectToHub() {
+  
     let newHubConnection = new HubConnectionBuilder()
     .withUrl('http://localhost:5282/hubs/pizza')
     .build();
 
+
+    // this is to update the count of users 
     newHubConnection.on("UpdateNbUsers", (data) => {
 
       setUserCount(data); 
     })
 
+    newHubConnection.on("UpdateMoney", (data) =>{
+
+      
+      setMoney(data); 
+
+      console.log(data)
+    })
+
+    newHubConnection.on("UpdatePizzaPrice", (data) => {
+      setPizzaPrice(data); 
+    })
+
+  newHubConnection.on("UpdateNbPizzasAndMoney", (data1, data2) => {
+            setNbPizzas(data1); 
+            setMoney(data2); 
+    })
+
+
+
+
+
+
+
+
+
+
     newHubConnection.start().then(() => {
             console.log('La connexion est active!');
+  
+  setHubConnection(newHubConnection); 
+
+    setIsConnected(true); 
           })
         .catch(err => console.log('Error while starting connection: ' + err));
 
-        setHubConnection(newHubConnection); 
+      
 
     // TODO: Mettre isConnected à true seulement une fois que la connection au Hub est faite
-    setIsConnected(true);
+
+
+
+ 
+  
   }
 
-  function selectChoice(selectedChoice:number) {
+ async function selectChoice(selectedChoice:number) {
     setSelectedChoice(selectedChoice);
+
+    await hubConnection?.invoke("SelectChoice", selectedChoice); 
+
+    // await hubConnection?.on("UpdatePizzaPrice", (data) => {
+
+    //   setPizzaPrice(data);
+    // })
   }
 
   function unselectChoice() {
     setSelectedChoice(-1);
   }
 
-  function addMoney() {
+  async function addMoney() {
 
 
-    hubConnection?.invoke("AddMoney", selectChoice ); 
+  await  hubConnection?.invoke("AddMoney", selectedChoice ); 
 
-
-
-    hubConnection?.on("UpdateMoney", (data) =>{
+  
+  // hubConnection?.on("UpdateMoney", (data) =>{
 
       
-      setMoney(data); 
-    })
+  //     setMoney(data); 
+
+  //     console.log(data)
+  //   })
+  
   }
 
   function buyPizza() {
 
-    hubConnection?.invoke("BuyPizza", selectChoice); 
+    hubConnection?.invoke("BuyPizza", selectedChoice); 
 
-    hubConnection?.on("UpdateNbPizzasAndMoney", (data1, data2) => {
-            setNbPizzas(data1); 
-            setMoney(data2); 
-    })
+ 
   }
 
   return (
